@@ -1,23 +1,32 @@
-import { APIGatewayEvent, Context, Callback } from 'aws-lambda';
-import { loginHandler } from './handlers/loginHandler';
-import { signUpHandler } from './handlers/signUpHandler';
-import { sendResponse } from './utils/responseHelper';
+import express from 'express';
+import serverless from 'serverless-http';
+import {MigrationObserver} from './observers/migration.observer';
+import routes from './routes';
+const app = express();
 
-export const handler = async (event: APIGatewayEvent, context: Context, callback: Callback) => {
-    try {
-        switch (event.httpMethod) {
-            case 'POST':
-                if (event.path === '/login') {
-                    return await loginHandler(event);
-                } else if (event.path === '/signup') {
-                    return await signUpHandler(event);
-                } else {
-                    return sendResponse(404, { message: 'Not Found' });
-                }
-            default:
-                return sendResponse(405, { message: 'Method Not Allowed' });
-        }
-    } catch (error) {
-        return sendResponse(500, { message: 'Internal Server Error', error: error.message });
-    }
-};
+async function  loadServer(){
+    app.use(express.json());
+    app.use('/', routes);
+    await MigrationObserver.getInstance().start()
+    app.use((_req: express.Request, res: express.Response, _next: express.NextFunction) => {
+      res.status(404).send();
+    });
+    
+    app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+      console.error("I AM IN ERROR",  err.stack);
+      res.status(err.status || 500).json({err: err.message?? "Internal Server Error"});
+    });
+}
+// Load the server and handle errors
+loadServer().catch((error) => {
+    console.error('Error loading server:', error);
+});
+
+// app.listen(3000, () => {
+//     console.log(`Server is running on port ${3000}`);
+// });
+
+// if(envConfig.IS_LOCAL_APP){
+ 
+// }
+export const handler = serverless(app);

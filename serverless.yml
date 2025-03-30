@@ -1,29 +1,14 @@
-service: aws-lambda-project
-
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: mali5678
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: addai
+service: AdSyncAi
 provider:
   name: aws
   runtime: nodejs20.x
-  region: us-east-1
-  environment:
-    MONGO_URI: ${env:MONGO_URI}
-    JWT_SECRET: ${env:JWT_SECRET}
-
 functions:
-  signUp:
-    handler: src/handlers/signUpHandler.signUpHandler
+  app:
+    handler: dist/app.handler
     events:
-      - http:
-          path: signup
-          method: post
-          cors: true
-
-  login:
-    handler: src/handlers/loginHandler.loginHandler
-    events:
-      - http:
-          path: login
-          method: post
-          cors: true
-
-plugins:
-  - serverless-offline
+      - http: ANY /
+      - http: ANY /{proxy+}
