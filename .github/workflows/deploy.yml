@@ -20,7 +20,7 @@ jobs:
           node-version: 20
 
       - name: Install All Dependencies (Including Dev)
-        run: npm ci  # Installs all dependencies for build
+        run: npm install  # Installs all dependencies for build
 
       - name: Build Application
         run: npm run build  # Ensure package.json has a build script that generates dist/
@@ -29,7 +29,7 @@ jobs:
         run: rm -rf node_modules package-lock.json
 
       - name: Install Only Production Dependencies
-        run: npm ci --only=production  # Installs only required dependencies
+        run: npm install --only=production  # Installs only required dependencies
 
       - name: Install Serverless Framework
         run: npm install -g serverless
