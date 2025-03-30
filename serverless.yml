@@ -1,14 +1,23 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: mali5678
-# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
-app: addai
 service: AdSyncAi
+
 provider:
   name: aws
   runtime: nodejs20.x
+  region: ap-south-1  # Change to your preferred AWS region
+  stage: production
+
 functions:
   app:
     handler: dist/app.handler
     events:
       - http: ANY /
       - http: ANY /{proxy+}
+
+package:
+  patterns:
+    - dist/**            # Include compiled code
+    - node_modules/**    # Include installed dependencies
+    - package.json       # Include package metadata
+    - package-lock.json  # Ensure correct dependencies
+  exclude:
+    - "**"
