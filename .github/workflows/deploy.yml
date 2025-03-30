@@ -3,7 +3,7 @@ name: Deploy Serverless App
 on:
   push:
     branches:
-      - develop  # Change this if using another branch
+      - main  # Change this if using another branch
 
 jobs:
   deploy:
@@ -19,11 +19,17 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies (Production Only)
-        run: npm ci --only=production  # Installs only required dependencies
+      - name: Install All Dependencies (Including Dev)
+        run: npm ci  # Installs all dependencies for build
 
       - name: Build Application
-        run: npm run build  # Ensure your package.json has a build script
+        run: npm run build  # Ensure package.json has a build script that generates dist/
+
+      - name: Remove All Dependencies (Cleanup)
+        run: rm -rf node_modules package-lock.json
+
+      - name: Install Only Production Dependencies
+        run: npm ci --only=production  # Installs only required dependencies
 
       - name: Install Serverless Framework
         run: npm install -g serverless
@@ -33,7 +39,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # Change to your AWS region
+          aws-region: us-east-1  # Change to your AWS region
 
       - name: Deploy to AWS using Serverless
         run: serverless deploy
