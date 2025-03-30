@@ -3,7 +3,7 @@ name: Deploy Serverless App
 on:
   push:
     branches:
-      - main  # Change this if using another branch
+      - develop  # Change this if using another branch
 
 jobs:
   deploy:
