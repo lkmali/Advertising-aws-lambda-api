@@ -2,9 +2,9 @@ service: AdSyncAi
 
 provider:
   name: aws
+  stage: dev
   runtime: nodejs20.x
   region: ap-south-1  # Change to your preferred AWS region
-  stage: production
 
 functions:
   app:
